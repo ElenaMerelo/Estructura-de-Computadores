@@ -1,6 +1,6 @@
 # Resolución del examen de julio 2017~ Estructura de computadores
-1. Respecto a direccionamiento a memoria en ensamblador IA32 (sintaxis AT&T), de la forma D(Rb, Ri, S), sólo una de las siguientes afirmaciones es FALSA.
-¿Cuál?
+**1. Respecto a direccionamiento a memoria en ensamblador IA32 (sintaxis AT&T), de la forma D(Rb, Ri, S), sólo una de las siguientes afirmaciones es FALSA.
+¿Cuál?**
 
   a. El desplazamiento D puede ser una constante literal (1, 2 ó 4 bytes)
 
@@ -18,8 +18,8 @@ Si uno de ellos no aparece, por defecto: D=0, Rb=0, Ri=0 y Fe=1.
 
   Por ello a), c) y d) son verdaderas, **b)** es falsa ya que Rb puede ser cualquier registro base.
 
-2. La extensión de signo a m bits de un número original N de n bits, con m > n,
-consiste en:
+**2. La extensión de signo a m bits de un número original N de n bits, con m > n,
+consiste en:**
 
   a. Realizar la operación 2 m – N
 
@@ -38,7 +38,7 @@ consiste en:
 
   Basándonos en lo anterior, en el tercer párrafo específicamente, afirmamos que la opción correcta es **c)**.
 
-3. En IA32, ¿cuál de los siguientes fragmentos de programa tiene un efecto sobre los flags distinto al resto?
+**3. En IA32, ¿cuál de los siguientes fragmentos de programa tiene un efecto sobre los flags distinto al resto?**
 
   a. sub %edi, %edi
      adc $0xFFFFFFFF, %edi
@@ -72,7 +72,7 @@ consiste en:
   Not all instructions affect all status flags: add and sub affect all six flags; inc and dec affect all but the carry flag; mov, push and pop do not affect any flags.
   Assuming intel x86 assembler: Both ADD and ADC will set the Carry Flag on high-order bit carry or borrow and it will be cleared otherwise. Using ADC when the CF is 1 and there is no overflow, will result in CF=0.
 
-  Así, b) no modifica ningún flag, d) cambia el de signo, le está restando 1 a un registro en el que teníamos almacenado 0, c) está sumando 0 a un registro en el que tenemos -1, si eso modificaría también el flag de signo. La opción restante es **a)**, que resta a un registro él mismo, con lo que resultará 0 y ZF se activará, adc lee el bit de acarreo y lo consume, sumándoselo a %edi si tiene, sino no hace nada, cambian flags diferentes a los demás.
+  Así, b) no modifica ningún flag, d) cambia el de signo, le está restando 1 a un registro en el que teníamos almacenado 0, c) está sumando 0 a un registro en el que tenemos -1, si eso modificaría también el flag de signo. La opción restante es a), que resta a un registro él mismo, con lo que resultará 0 y ZF se activará, adc lee el bit de acarreo y lo consume, sumándoselo a %edi si tiene, sino no hace nada. Todas las instrucciones modifican los flags salvo **b)**, tiene pues un efecto sobre los flags diferente al resto, es la solución.
 
 **4. Si %rsp vale 0xdeadbeefdeadd0d0, ¿cuál será su nuevo valor después de que se ejecute pushq %rbx?**
 
@@ -84,10 +84,71 @@ consiste en:
 
   d. 0xdeadbeefdeadd0c8
 
+  La solución es **d)**, ya que estamos haciendo push de una quadword, que ocupa 8 bytes.
+
+**5. ¿Cómo se devuelve en ensamblador x86-64 Linux gcc el valor de retorno de una función long int al terminar ésta?**
+
+  a. La instrucción RET lo almacena en un registro especial de retorno.
+
+  b. Por convención se guarda en %eax.
+
+  c. Se almacena en pila justo encima de los argumentos de la función.
+
+  d. Ninguna de esas formas es la correcta.
+
+  >Una subrutina en ensamblador sería equivalente a una función en C. Básicamente, una subrutina es un conjunto de instrucciones que inician su ejecución en un punto de código identificado con una etiqueta que será el nombre de la subrutina, y finaliza con la ejecución de una instrucción ret, instrucción de retorno de subrutina, que provoca un salto a la instrucción siguiente desde donde se ha hecho la llamada (call).
+  Consideraciones importantes a la hora de definir una subrutina:
+  -> Debemos almacenar los registros modificados dentro de la subrutina para dejarlos en el mismo estado en el que se encontraban en el momento de hacer la llamada a la subrutina, salvo los registros que se utilicen para devolver un valor. Para almacenar los registros modificados utilizaremos la pila.
+  -> Para mantener la estructura de una subrutina y para que el programa funcione correctamente, no se pueden efectuar saltos a instrucciones de la subrutina; siempre finalizaremos la ejecución de la subrutina con la instrucción ret.
+  El retorno de resultados puede efectuarse por medio de registros o de la pila.
+  Si queremos pasar parámetros y devolver resultados a una subrutina utilizando la pila, y una vez definidos los parámetros que queremos pasar y los que queremos retornar, hay que hacer lo siguiente:
+  1)Antes de hacer la llamada a la subrutina: es necesario reservar espacio en la pila para los datos que queremos devolver y a continuación introducir los parámetros necesarios en la pila.
+  2)Dentro de la subrutina: hay que acceder a los parámetros leyéndolos directamente de memoria, utilizando un registro que apunte a la cima de la pila. El registro apuntador de pila, RSP, siempre apunta a la cima de la pila y, por lo tanto, podemos acceder al contenido de la pila haciendo un direccionamiento a memoria que utilice RSP, pero si utilizamos la pila dentro de la subrutina, no se recomienda utilizarlo.
+  El registro que se suele utilizar como apuntador para acceder a la pila es el
+  registro RBP. Antes de utilizarlo, lo tendremos que almacenar en la pila para
+  poder recuperar el valor inicial al final de la subrutina, a continuación se carga
+  en RBP el valor de RSP.
+  RBP no se debe cambiar dentro de la subrutina; al final de esta se copia el valor
+  sobre RSP para restaurar el valor inicial.
+  3)Después de ejecutar la subrutina: una vez fuera de la subrutina es necesario
+  liberar el espacio utilizado por los parámetros de entrada y después recuperar
+  los resultados del espacio que hemos reservado antes de hacer la llamada.
+  Hay que tener presente que el procesador también utiliza la pila para almacenar los valores necesarios para poder efectuar un retorno de la subrutina de manera correcta. En concreto, siempre que se ejecuta una instrucción call, el procesador guarda en la cima de la pila la dirección de retorno (el valor actualizado del contador de programa RIP). Es importante asegurarse de que en el momento de hacer
+  ret la dirección de retorno se encuentre en la cima de la pila; en caso contrario, se romperá la secuencia normal de ejecución.
+  Eso se consigue si no se modifica el valor de RBP dentro de la subrutina y al
+  final se ejecutan las instrucciones:
+  mov rsp, rbp    ;Restauramos el valor inicial de RSP con RBP
+  pop rbp         ;Restauramos el valor inicial de RBP
+  The return value of a function is in eax. If you've called a C function from asm, you can read the return value from eax. If you're trying to return from an asm function to C, store the intended return value in eax.
+  **Things get a little bit more complicated for returning floating point values, long long values, or structures**
+  Return Value of a function in assembly
+      Integers (of any size up to 32 bits) and pointers are returned in the %eax register.
+      Floating point values are returned in the 387 top-of-stack register, st(0).
+      Return values of type long long int are returned in %edx:%eax (the most significant word in %edx and the least significant in %eax).
+      Returning a structure is complicated and rarely useful; try to avoid it. (Note that this is different from returning a pointer to a structure).
+  If your function returns void (e.g. no value), the contents of these registers are not used.
+  The ret instruction transfers control to the return address located on the stack. This address is usually placed on the stack by a call instruction. Issue the ret instruction within the called procedure to resume execution flow at the instruction following the call.
+  The optional numeric (16- or 32-bit) parameter to ret specifies the number of stack bytes or words to be released after the return address is popped from the stack. Typically, these bytes or words are used as input parameters to the called procedure.
+
+  En conclusión, por ser la función de tipo long int no se guarda en %eax, se devolverá la palabra más significativa por %edx y la menos por %eax, luego la opción b) es falsa. a) es falsa ya que ret no almacena en un registro especial de retorno, sino en la cima de la pila, donde le toque, no justo encima de los argumentos de la función como dice c). Ninguna de las formas es pues correcta, y **d)** es verdadera.
+
+**6. Comparando las convenciones de llamada de gcc Linux IA32 con x86-64 respecto a registros**
+  a. En IA32 %ebx es salva-invocante, pero en x86-64 %rbx es salva-invocado
+
+  b. En IA32 %ecx es salva-invocante, y en x86-64 %rcx es salva-invocante también
+
+  c. En IA32 %esi es salva-invocado, y en x86-64 %rsi es salva-invocado también
+
+  d. En IA32 %ebp es especial (marco de pila), y en x86-64 %rbp también
 
 
 
 
 
 
- #
+
+
+
+
+
+  #
