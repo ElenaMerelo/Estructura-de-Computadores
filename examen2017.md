@@ -84,7 +84,14 @@ consiste en:**
 
   d. 0xdeadbeefdeadd0c8
 
-  La solución es **d)**, ya que estamos haciendo push de una quadword, que ocupa 8 bytes.
+  >The terms used to describe sizes in the x86 architecture are:
+    byte: 8 bits
+    word: 2 bytes
+    dword: 4 bytes (stands for "double word")
+    qword: 8 bytes (stands for "quad word")
+
+
+  La solución es **d)**, ya que estamos haciendo push de una quadword, que ocupa 8 bytes, y push decrementa el puntero de pila (ESP) el número de posiciones de memoria que ocupe el dato a insertar, posteriormente procede a escribir el dato en esas posiciones reservadas, a partir de donde apunta ESP ahora.
 
 **5. ¿Cómo se devuelve en ensamblador x86-64 Linux gcc el valor de retorno de una función long int al terminar ésta?**
 
@@ -130,9 +137,10 @@ consiste en:**
   The ret instruction transfers control to the return address located on the stack. This address is usually placed on the stack by a call instruction. Issue the ret instruction within the called procedure to resume execution flow at the instruction following the call.
   The optional numeric (16- or 32-bit) parameter to ret specifies the number of stack bytes or words to be released after the return address is popped from the stack. Typically, these bytes or words are used as input parameters to the called procedure.
 
-  En conclusión, por ser la función de tipo long int no se guarda en %eax, se devolverá la palabra más significativa por %edx y la menos por %eax, luego la opción b) es falsa. a) es falsa ya que ret no almacena en un registro especial de retorno, sino en la cima de la pila, donde le toque, no justo encima de los argumentos de la función como dice c). Ninguna de las formas es pues correcta, y **d)** es verdadera.
+  En conclusión, por ser la función de tipo long int no se guarda en %eax, se devolverá la palabra más significativa por %edx y la menos por %eax, luego la opción b) es falsa. a) es falsa ya que ret no almacena en un registro especial de retorno, sino que recupera de la pila la dirección de retorno. Ninguna de las formas es pues correcta, y **d)** es verdadera.
 
 **6. Comparando las convenciones de llamada de gcc Linux IA32 con x86-64 respecto a registros**
+
   a. En IA32 %ebx es salva-invocante, pero en x86-64 %rbx es salva-invocado
 
   b. En IA32 %ecx es salva-invocante, y en x86-64 %rcx es salva-invocante también
@@ -141,14 +149,56 @@ consiste en:**
 
   d. En IA32 %ebp es especial (marco de pila), y en x86-64 %rbp también
 
+  >Convenciones de preservación de registros
+  Cuando el procedimiento yoo llama a who:
+  + yoo es el que llama (invocante, llamante)
+  + who es el llamado (invocado)
+
+  >¿Se puede usar un registro para almacenam. temp.? Convenciones:
+  + “Salva Invocante”~ El que llama salva valores temporales en su marco antes de la llamada.
+  + “Salva Invocado”~ El llamado salva valores temporales en su marco antes de reusar registros.
+
+  >Uso de registros en IA32/Linux+Windows
+  + %eax, %edx, %ecx- Invocante salva antes de llamada
+  + %eax- tb. usado para devolver v. entero
+  + %ebx, %esi, %edi- Invocado salva si quiere usarlos
+  + %esp, %ebp- forma especial de invocado-salva. Restaurados a su valor original al salir del procedimiento.
+
+  >**En definitiva, los registros temporales salva-invocante son %eax, %edx y %ecx, los temporales salva-invocado %ebx, %esi, %edi y los especiales %esp y %ebp, en IA32.**
+
+  >Uso de registros en x86-64: Convenios de uso
+  + %rax Valor retorno
+  + %rsp Puntero de pila
+  + Salva-invocados: %rbx, %rbp, %r12, %r13, %r14, %r15
+  + Salva-invocantes: %r10, %r11
+  + Argumentos: 1 %rdi, 2 %rsi, 3 %rdx, 4 %rcx, 5 %r8, 6 %r9. Estos registros pueden usarse también como salva-invocante
+
+  Basándonos en lo anterior, a) es falsa, ya que en IA32 %ebx no es salva-invocante sino salva-invocado aunque en x86-64 %rbx sí sea salva-invocado. **b)** es verdadera, y en c) es cierto que en IA32 %esi es salva-invocado pero en x86-64 %rsi es usado para pasar argumento, luego salva-invocante. d) es falsa porque %rbp no es especial en x86-64.
+
+
+**7.Son funciones de la unidad de control:**
+
+  a. La codificación de las instrucciones máquina
+  b. La lectura de memoria principal de la instrucción apuntada por el μPC
+  c. El secuenciamiento de las instrucciones máquina
+  d. Todas las respuestas son ciertas
+
+  
 
 
 
 
 
 
-
-
-
+>Pila IA32: Push
+pushl Src
+-> Capta el operando en Src
+-> Decrementa %esp en 4
+-> Escribe operando en dir. indicada por %esp
+Pila IA32 : Pop
+popl Dest
+ Capta operando de dir. indicada por %esp
+-> Incrementa %esp en 4
+-> Escribe el operando en Dest
 
   #
