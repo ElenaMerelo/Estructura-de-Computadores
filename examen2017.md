@@ -183,10 +183,41 @@ consiste en:**
   c. El secuenciamiento de las instrucciones máquina
   d. Todas las respuestas son ciertas
 
-  
+  >Según las diapositivas, detecta señales de estado (eléctricas) procedentes de las distintas unidades, capta de la memoria una a una las instrucciones máquina del programa, y genera señales de control dirigidas a todas las unidades, monitorizando las operaciones que implican la ejecución de la instrucción. Contiene un reloj que sincroniza todas las operaciones elementales de la computadora. El periodo del reloj se denomina tiempo de ciclo (entre décimas de ns y varios μs). La frecuencia del reloj (MHz ó GHz) determina, en parte, la velocidad de funcionamiento del computador.
 
+  >La UC interpreta y controla la ejecución de instrucciones leídas de memoria en dos fases:
+  + Fase de captación de instrucción: leer la dirección de la instrucción a ejecutar, leerla de memoria, llevarla al registro adecuado para su ejecución e incrementar PC para que apunte a la siguiente instrucción.
+  + Fase de ejecución: la instrucción se decodifica y ejecuta bajo el control de la UC y para ello se realizan las operaciones específicas correspondientes al código de operación (codop) de la instrucción captada y se generan las señales de control oportunas.
 
+  >Unidad de control cableada: analiza o interpreta la instrucción máquina almacenada en IR y los valores de los biestables (FF, esp, ir) y genera las 29 señales de control que monitorizan el funcionamiento de los distintos elementos del computador. Estas señales de control (o microórdenes) producen microoperaciones en un orden predeterminado de forma sincronizada con un estado máquina.
 
+  >Unidad de control microprogramada: genera, en cada pulso de reloj, un vector de 29 microórdenes (señales de control). Se pueden grabar en una memoria ROM, llamada memoria de control (MC), esos vectores. La UC microprogramada está formada por la memoria de control y una serie de circuitos denominado secuenciador de la memoria de control que genera las direcciones de las posiciones de las palabras de la memoria de control a leer.
+
+  Conscuentemente, **b)** no es verdadera se lee la instrucción almacenada en IR, la UC no cofidifica instrucciones máquina sino que las decodifica en la fase de ejecución por lo que la a) es falsa también. La opción restante y verdadera es **c)**, la última frase del párrafo anterior lo confirma.
+
+**8. Respecto a MDR y MAR**
+  a. Ambos son accesibles por el programador
+  b. MAR contiene el dato/instrucción que se leerá o escribirá en memoria
+  c. MAR requiere menos señales de control que MBR
+  d. Ambos permiten guardar información sobre el marco de pila
+
+  >Registros
+  + PC: contador de programa
+  + RI: registro de instrucción
+  + SP: puntero de pila
+  + MAR: registro de direcciones de memoria
+  + MBR: registro de datos de memoria
+  + RE: registro de estado
+  + Registros transparentes al usuario: RT1, RT2, RT3.
+  + Otros registros de control y estado: MAR, MBR, PC, RE, RI
+
+  >El Memory Address Register (MAR), Registro de Direcciones de Memoria, es un registro específico de alta velocidad, integrado en el microprocesador, que contiene la dirección del dato que se quiere leer o escribir. El registro está conectado con el bus de direcciones, y su contenido se refleja en éste.
+
+  >Un registro de arranque principal, conocido también como registro de arranque maestro (por su nombre en inglés master boot record, MBR) es el primer sector de un dispositivo de almacenamiento de datos, como un disco duro. A veces, se emplea para el arranque del sistema operativo con bootstrap, otras veces es usado para almacenar una tabla de particiones y, en ocasiones, se usa sólo para identificar un dispositivo de disco individual, aunque en algunas máquinas esto último no se usa y es ignorado.
+
+  >¡Libro Organización de computadores 5º edición Karl Hamacher,... cap 1.3-> Finalmente, dos registros facilitan la comunicación con la memoria. Son el registro de dirección de memoria(MAR) y el registro de datos de memoria(MDR). El MAR contiene la dirección de la posición a la que se va a acceder. El MDR contiene los datos que se van a escribir o que se han leído de la posición direccionada. Consoderemos ahora algunos pasopicos de funcionamiento. Los programas residen en memoria, y usualmente llegan ahó a través de la unidad de entrada. La ejecución de un programa comienza cuando al PC se le dice que apunte a la primera instrucción del programa. El contenido del PC se transfiere al MAR y se envía a la memoria una señal de control de lectura. Después de que el tiempo requerido para acceder a la memoria pasa, la palabra direccionada se lee de la memoria y se carga en el MDR. Luego los contenidos del MDR se transfieren al IR. En este punto la instrucción está lista para ser decodificada y ejecutada.
+
+    b) es falsa ya que MAR no contiene el dato sino la dirección que se leerá/escribirá en memoria, d) también ya que solo MAR guarda información sobre el marco de pila, y MBR tiene poca capacidad, requerirá menos señales de control que MAR, con lo que c) queda descartada. Por lo tanto, **a)** es la opción verdadera.
 
 
 
