@@ -1,18 +1,18 @@
 **1. Ensamblador (0.3 puntos). Escriba la instrucción máquina (una sola)
 necesaria para llevar a cabo cada una de las siguientes operaciones:**
 a. (0.05) Quitar un entero de la cabecera de la pila y guardarlo en el reg. EAX:
-`pop %eax`
+`pop %eax` o `popl %eax`
 
-b. (0.05) Sumar el valor del indicador de acarreo (CF) al registro ECX: `adc %ecx`
+b. (0.05) Sumar el valor del indicador de acarreo (CF) al registro ECX: `adc $0, %ecx` o `adcl $0, %ecx`
 
 c. (0.05) Llamar a la función f: `call f`
 
-d. (0.05) Copiar el carácter (byte) situado en la cabecera de la pila en el registro CL sin alterar la pila: `mov $ebx, %cl`
+d. (0.05) Copiar el carácter (byte) situado en la cabecera de la pila en el registro CL sin alterar la pila: `mov (%esp), %cl` o `movb (%esp), %cl`
 
 e. (0.05) Multiplicar el contenido del registro EAX por 5, dejando el resultado
-en el mismo registro: `imul 5`
+en el mismo registro: `imul $5, %eax`, `imull $0x5, %eax`, `lea (%eax, %eax, 4), %eax` o `leal (%eax, %eax, 4), %eax`
 
-f. (0.05) Poner el registro EDX a cero sin usar la instrucción mov:
+f. (0.05) Poner el registro EDX a cero sin usar la instrucción mov: `xorl %edx, %edx`, `andl $0, %edx`, `and 0x0, %edx`, `mov $0, %eax`, `sub %edx, %edx`, `imul $0, %edx` o `leal $0, %edx`, `lea 0x0, %edx`
 
 >All the following instructions do the same thing: set %eax to zero. The optimal is the one with xorl.
 ~~~
@@ -40,13 +40,13 @@ struct b {
 };
 ~~~
 a. (0.2) Indicar cuántos bytes ocupa struct a en Linux gcc x86:
-float * -> 4 bytes alineado, char-> 1, int-> 4, char de 4-> 4*4= 16, double->4, short-> 2 bytes, en total entonces: 4+1+4+16+4+2= **21bytes**.
-
+float * -> 4 bytes alineado, char-> 1, x->3 bytes para que esté alineado el int, int-> 4, char de 4-> 4, double->4, short-> 2 bytes, x->2 en total entonces: **28 bytes**.
+**El último x se añade de forma que la suma total sea múltiplo del mayor alineamiento, en este caso 4 bytes**.
 b. (0.2) Indicar cuántos bytes ocupa struct a en Linux gcc x86-64:
-float* -> 8, char-> 1, int->4, char de 4-> 16, double-> 8, short-> 2, total: **39 bytes**.
-c. (0.2) Indicar cuántos bytes ocupa struct b en Linux gcc x86:
+float* -> 8, char-> 1, x->3, int->4, char de 4-> 4, x->4 para que el siguiente esté en múltiplo de 8, double-> 8, short-> 2, x->6 total: **40 bytes**.
+c. (0.2) Indicar cuántos bytes ocupa struct b en Linux gcc x86:struct a-> 28, el int tiene que estar en algún múltiplo de 4, y 28 lo es luego no hemos de sumar ningún x, int-> 4, con lo que ya tenemos 32 bytes, que vuelve a ser múltiplo de 4, el mayor alineamiento precisado por un dato en el struct a, no hemos de sumar desplazamiento, struct-> 28bytes, en total: **60 bytes**.
 
-d. (0.2) Indicar cuántos bytes ocupa struct b en Linux gcc x86-64:
+d. (0.2) Indicar cuántos bytes ocupa struct b en Linux gcc x86-64: struct-> 40, que es múltiplo de 8, no añado offset, int-> 4, 44 no es múltiplo de 8, x->4, struct-> 40, tenemos pues finalmente **88 bytes**.
 
 >Typical alignment of C structs on x86
 Data structure members are stored sequentially in memory so that, in the structure below, the member Data1 will always precede Data2; and Data2 will always precede Data3:
@@ -138,3 +138,47 @@ struct MixedData{  /* after reordering*/
 };
 ~~~
 The compiled size of the structure now matches the pre-compiled size of 8 bytes. Note that Padding1[1] has been replaced (and thus eliminated) by Data4 and Padding2[3] is no longer necessary as the structure is already aligned to the size of a long word.
+
+**4. Unidad de Control (0.4 puntos).
+Calcule:
+a. (0.1) El tamaño en bits total de dicha memoria de control
+
+b. (0.2) El tamaño en bits total que requeriría un diseño nanoprogramado
+
+c. (0.1) El ahorro en bits expresado en porcentaje**
+
+a. Tamaño_en_bits_memoria= número_de_direcciones * número_de_bits_del_contenido
+
+b. Tamaño_en_bits_diseño_nanoprogramado= 14*3 + 5*8
+
+c. (Tamaño_en_bits_memoria - tamañTamaño_en_bits_diseño_nanoprogramado)/ tamañTamaño_en_bits_memoria
+
+**5. Entrada/Salida (0.5 puntos). Complete el código ensamblador de una función
+`void write_value (unsigned char value)` que realice una operación de salida con consulta de estado. El puerto de estado, en la dirección 0x22C, puede leerse con la instrucción inb $0x22C, %al . El puerto de datos de salida, en la misma dirección 0x22C, puede escribirse con la instrucción outb %al, $0x22C . La consulta de estado consistirá en leer del puerto de estado mientras el bit 7 valga 1, o sea, leer el puerto hasta que el bit 7 valga 0. Sólo entonces puede procederse a escribir el dato pasado a la función en el puerto de datos de salida.**
+~~~
+write_value:
+pushl %ebp
+movl %esp, %ebp
+; Escribir código de salida programada
+; con consulta de estado desde aquí...
+; ...hasta aquí
+popl %ebp
+ret
+~~~
+**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
