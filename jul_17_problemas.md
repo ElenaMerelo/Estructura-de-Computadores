@@ -40,9 +40,10 @@ struct b {
 };
 ~~~
 a. (0.2) Indicar cuántos bytes ocupa struct a en Linux gcc x86:
+float * -> 4 bytes alineado, char-> 1, int-> 4, char de 4-> 4*4= 16, double->4, short-> 2 bytes, en total entonces: 4+1+4+16+4+2= **21bytes**.
 
 b. (0.2) Indicar cuántos bytes ocupa struct a en Linux gcc x86-64:
-
+float* -> 8, char-> 1, int->4, char de 4-> 16, double-> 8, short-> 2, total: **39 bytes**.
 c. (0.2) Indicar cuántos bytes ocupa struct b en Linux gcc x86:
 
 d. (0.2) Indicar cuántos bytes ocupa struct b en Linux gcc x86-64:
@@ -76,16 +77,16 @@ struct MyData
 
 >A **long long** (eight bytes) will be **4-byte aligned**.
 
->A long double (ten bytes with C++Builder and DMC, eight bytes with Visual C++, twelve bytes with GCC) will be 8-byte aligned with C++Builder, 2-byte aligned with DMC, 8-byte aligned with Visual C++, and **4-byte aligned with GCC**.
+>A **long double** (ten bytes with C++Builder and DMC, eight bytes with Visual C++, twelve bytes with GCC) will be 8-byte aligned with C++Builder, 2-byte aligned with DMC, 8-byte aligned with Visual C++, and **4-byte aligned with GCC**.
 
->Any pointer (four bytes) will be 4-byte aligned. (e.g.: char*, int*)
+>Any **pointer** (four bytes) will be **4-byte aligned**. (e.g.: char*, int*)
 
->The only notable differences in alignment for an LP64 64-bit system when compared to a 32-bit system are:
-    A long (eight bytes) will be 8-byte aligned.
-    A double (eight bytes) will be 8-byte aligned.
-    A long long (eight bytes) will be 8-byte aligned.
-    A long double (eight bytes with Visual C++, sixteen bytes with GCC) will be 8-byte aligned with Visual C++ and 16-byte aligned with GCC.
-    Any pointer (eight bytes) will be 8-byte aligned.
+>The only notable differences in alignment for an LP64 **64-bit** system when compared to a 32-bit system are:
+    A **long** (eight bytes) will be **8-byte aligned**.
+    A **double** (eight bytes) will be **8-byte aligned**.
+    A **long long** (eight bytes) will be **8-byte aligned**.
+    A **long double** (eight bytes with Visual C++, sixteen bytes with GCC) will be 8-byte aligned with Visual C++ and **16-byte aligned with GCC**.
+    Any **pointer** (eight bytes) will be **8-byte aligned**.
 
 >Some data types are dependent on the implementation.
 Here is a structure with members of various types, totaling 8 bytes before compilation:
