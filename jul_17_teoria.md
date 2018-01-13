@@ -232,4 +232,7 @@ popl Dest
 -> Incrementa %esp en 4
 -> Escribe el operando en Dest
 
+
+>Sufijos en x86: b->1 byte, w->2 bytes, l->4 bytes y q->8 bytes ocupa.
+
   #
